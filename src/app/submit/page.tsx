@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import { Upload, Link as LinkIcon, Info, Send } from 'lucide-react';
-import { motion } from 'framer-motion';
 
 export default function SubmitPage() {
   const [done, setDone] = useState(false);
