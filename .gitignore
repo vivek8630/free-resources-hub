@@ -23,6 +23,10 @@
 # misc
 .DS_Store
 *.pem
+.FullName
+combined_codebase.txt
+combine_files.ps1
+tsconfig.tsbuildinfo
 
 # debug
 npm-debug.log*
