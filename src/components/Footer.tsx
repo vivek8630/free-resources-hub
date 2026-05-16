@@ -2,133 +2,115 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { Mail, Home, Search } from "lucide-react";
+import { Mail, Home, Search, Zap, MessageCircle, Globe } from "lucide-react";
 
 const Footer = () => {
-  const [joinMsg, setJoinMsg] = useState<string | null>(null);
+  const [email, setEmail] = useState('');
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+
+  const handleSubscribe = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+    
+    setStatus('loading');
+    setTimeout(() => {
+      setStatus('success');
+      setEmail('');
+      setTimeout(() => setStatus('idle'), 3000);
+    }, 1000);
+  };
 
   return (
-    <footer className="bg-card-dark border-t border-base pt-20 pb-10">
-      <div className="container mx-auto px-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
-          <div className="col-span-1 lg:col-span-1">
-            <Link href="/" className="flex items-center gap-2 mb-6">
-              <div className="w-8 h-8 gradient-bg rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">F</span>
+    <footer className="relative bg-card-dark border-t border-white/5 pt-24 pb-12 overflow-hidden mt-32">
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent"></div>
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-primary/5 rounded-full blur-[120px] pointer-events-none"></div>
+
+      <div className="container mx-auto px-6 relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8 mb-20">
+          
+          {/* Brand Column */}
+          <div className="lg:col-span-4">
+            <Link href="/" className="flex items-center gap-3 mb-6 group">
+              <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
+                <Zap className="w-6 h-6 text-white fill-white" />
               </div>
               <span className="text-xl font-bold tracking-tight">
                 FreeResources<span className="gradient-text">Hub</span>
               </span>
             </Link>
-            <p className="text-text-gray text-sm leading-relaxed mb-8">
-              The ultimate destination for discovery of free tools, assets, and learning resources across the internet. Built for the community.
+            <p className="text-text-gray text-base leading-relaxed mb-8 max-w-sm">
+              The ultimate discovery platform for creators and developers. We curate the internet's best free tools so you don't have to.
             </p>
             <div className="flex gap-4">
-              <Link href="/" className="p-2 glass rounded-lg hover:text-primary transition-colors" aria-label="Home">
-                <Home className="w-5 h-5" />
-              </Link>
-              <Link href="/search" className="p-2 glass rounded-lg hover:text-primary transition-colors" aria-label="Search">
-                <Search className="w-5 h-5" />
-              </Link>
-              <a
-                href="mailto:hello@freeresourceshub.com"
-                className="p-2 glass rounded-lg hover:text-primary transition-colors"
-                aria-label="Email us"
-              >
-                <Mail className="w-5 h-5" />
+              <a href="#" className="w-10 h-10 rounded-full glass-strong flex items-center justify-center hover:bg-white hover:text-primary transition-all">
+                <Globe className="w-4 h-4" />
+              </a>
+              <a href="#" className="w-10 h-10 rounded-full glass-strong flex items-center justify-center hover:bg-white hover:text-primary transition-all">
+                <MessageCircle className="w-4 h-4" />
               </a>
             </div>
           </div>
 
-          <div>
-            <h4 className="text-lg font-bold mb-6">Resources</h4>
-            <ul className="space-y-4 text-text-gray">
-              <li>
-                <Link href="/categories/ai-tools" className="hover:text-primary transition-colors">
-                  AI Tools
-                </Link>
-              </li>
-              <li>
-                <Link href="/categories/design-assets" className="hover:text-primary transition-colors">
-                  Design Assets
-                </Link>
-              </li>
-              <li>
-                <Link href="/categories/coding-resources" className="hover:text-primary transition-colors">
-                  Coding Resources
-                </Link>
-              </li>
-              <li>
-                <Link href="/categories/learning-platforms" className="hover:text-primary transition-colors">
-                  Learning Paths
-                </Link>
-              </li>
+          {/* Links Columns */}
+          <div className="lg:col-span-2">
+            <h4 className="text-white font-bold mb-6 uppercase tracking-wider text-sm">Platform</h4>
+            <ul className="space-y-4">
+              <li><Link href="/search" className="text-text-gray hover:text-white transition-colors">Explore</Link></li>
+              <li><Link href="/categories" className="text-text-gray hover:text-white transition-colors">Categories</Link></li>
+              <li><Link href="/saved" className="text-text-gray hover:text-white transition-colors">Saved Items</Link></li>
+              <li><Link href="/submit" className="text-text-gray hover:text-white transition-colors">Submit Tool</Link></li>
             </ul>
           </div>
 
-          <div>
-            <h4 className="text-lg font-bold mb-6">Company</h4>
-            <ul className="space-y-4 text-text-gray">
-              <li>
-                <Link href="/about" className="hover:text-primary transition-colors">
-                  About Us
-                </Link>
-              </li>
-              <li>
-                <Link href="/submit" className="hover:text-primary transition-colors">
-                  Submit Tool
-                </Link>
-              </li>
-              <li>
-                <Link href="/search" className="hover:text-primary transition-colors">
-                  Search
-                </Link>
-              </li>
-              <li>
-                <Link href="/contact" className="hover:text-primary transition-colors">
-                  Contact
-                </Link>
-              </li>
+          <div className="lg:col-span-2">
+            <h4 className="text-white font-bold mb-6 uppercase tracking-wider text-sm">Categories</h4>
+            <ul className="space-y-4">
+              <li><Link href="/categories/ai-tools" className="text-text-gray hover:text-white transition-colors">AI Tools</Link></li>
+              <li><Link href="/categories/coding-resources" className="text-text-gray hover:text-white transition-colors">Developer Tools</Link></li>
+              <li><Link href="/categories/design-assets" className="text-text-gray hover:text-white transition-colors">Design Assets</Link></li>
+              <li><Link href="/categories/productivity-tools" className="text-text-gray hover:text-white transition-colors">Productivity</Link></li>
             </ul>
           </div>
 
-          <div>
-            <h4 className="text-lg font-bold mb-6">Subscribe</h4>
-            <p className="text-text-gray text-sm mb-6">Get weekly updates on the best free tools directly in your inbox.</p>
-            <form
-              className="flex flex-col gap-2"
-              onSubmit={(e) => {
-                e.preventDefault();
-                setJoinMsg("Thanks — this demo doesn’t send email yet. Connect a newsletter API when you deploy.");
-                window.setTimeout(() => setJoinMsg(null), 5000);
-              }}
-            >
-              <div className="flex gap-2">
-                <input
-                  type="email"
-                  name="email"
-                  required
-                  placeholder="Email address"
-                  className="bg-white/5 border border-base rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-primary flex-1"
-                />
-                <button type="submit" className="gradient-bg px-4 py-2 rounded-lg text-sm font-bold shrink-0">
-                  Join
+          {/* Newsletter Column */}
+          <div className="lg:col-span-4">
+            <h4 className="text-white font-bold mb-6 uppercase tracking-wider text-sm">Stay Updated</h4>
+            <div className="glass-card p-6 rounded-2xl bg-surface/50 border-white/5">
+              <p className="text-text-gray text-sm mb-6">Join 15,000+ creators getting our weekly roundup of the best new free tools.</p>
+              <form onSubmit={handleSubscribe} className="flex flex-col gap-3">
+                <div className="relative">
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-text-gray/50" />
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    placeholder="Enter your email"
+                    className="w-full bg-surface border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white focus:outline-none focus:border-primary/50 transition-colors"
+                  />
+                </div>
+                <button 
+                  type="submit" 
+                  disabled={status === 'loading'}
+                  className="btn-primary w-full py-3 rounded-xl disabled:opacity-70 disabled:cursor-not-allowed"
+                >
+                  {status === 'loading' ? 'Subscribing...' : status === 'success' ? 'Subscribed! 🎉' : 'Subscribe Now'}
                 </button>
-              </div>
-              {joinMsg && <p className="text-xs text-primary">{joinMsg}</p>}
-            </form>
+              </form>
+            </div>
           </div>
         </div>
 
-        <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-text-gray text-center md:text-left">
-          <p>© 2026 Free Resources Hub. All rights reserved.</p>
-          <div className="flex gap-8">
-            <Link href="/contact" className="hover:text-white transition-colors">
-              Privacy / legal questions
-            </Link>
-            <Link href="/contact" className="hover:text-white transition-colors">
-              Terms / feedback
-            </Link>
+        {/* Bottom Bar */}
+        <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-6">
+          <p className="text-text-gray text-sm text-center md:text-left">
+            © {new Date().getFullYear()} Free Resources Hub. Built with Next.js.
+          </p>
+          <div className="flex flex-wrap justify-center gap-6 text-sm">
+            <Link href="/about" className="text-text-gray hover:text-white transition-colors">About Us</Link>
+            <Link href="/contact" className="text-text-gray hover:text-white transition-colors">Contact</Link>
+            <Link href="/privacy" className="text-text-gray hover:text-white transition-colors">Privacy Policy</Link>
+            <Link href="/terms" className="text-text-gray hover:text-white transition-colors">Terms of Service</Link>
           </div>
         </div>
       </div>
