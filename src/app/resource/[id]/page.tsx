@@ -1,241 +1,187 @@
 "use client";
 
-import React, { useState } from "react";
-import Link from "next/link";
-import { useParams } from "next/navigation";
-import {
-  ExternalLink,
-  Bookmark,
-  Star,
-  ArrowLeft,
-  CheckCircle2,
-  Info,
-  Share2,
-  Calendar,
-  Eye,
-  MessageSquare,
-  Search,
-} from "lucide-react";
-import { SITE_RESOURCES } from "@/data/site-resources";
+import { useParams, useRouter } from "next/navigation";
+import { SITE_RESOURCES, SiteResource } from "@/data/site-resources";
+import { ExternalLink, Star, Bookmark, Share2, AlertCircle, ArrowLeft } from "lucide-react";
+import { BadgeLabel } from "@/components/BadgeLabel";
+import { ToolFeatures } from "@/components/ToolFeatures";
+import { ReviewSection } from "@/components/ReviewSection";
+import { RelatedTools } from "@/components/RelatedTools";
 
-export default function ResourceDetailPage() {
+export default function ResourceDetail() {
   const params = useParams();
-  const [shareHint, setShareHint] = useState(false);
-  const id =
-    typeof params?.id === "string"
-      ? params.id
-      : Array.isArray(params?.id)
-        ? (params.id[0] ?? "")
-        : "";
-
-  const resource = SITE_RESOURCES[id];
-
-  const handleShare = async () => {
-    if (!resource) return;
-    const url = typeof window !== "undefined" ? window.location.href : "";
-    try {
-      if (navigator.share) {
-        await navigator.share({ title: resource.title, text: resource.description, url });
-      } else if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(url);
-      }
-      setShareHint(true);
-      window.setTimeout(() => setShareHint(false), 2200);
-    } catch {
-      /* user cancelled or clipboard blocked */
-    }
-  };
+  const router = useRouter();
+  const slug = params.id as string;
+  
+  const resource = SITE_RESOURCES[slug];
 
   if (!resource) {
     return (
-      <div className="pt-32 pb-20 container mx-auto px-6 text-center">
-        <h1 className="text-2xl font-bold mb-4">Resource not found</h1>
-        <p className="text-text-gray mb-8">
-          We don&apos;t have a page for that link yet.
-        </p>
-        <Link
-          href="/"
-          className="text-primary font-semibold underline hover:no-underline"
-        >
-          Back to home
-        </Link>
+      <div className="container mx-auto px-6 py-32 text-center">
+        <AlertCircle className="w-16 h-16 text-accent-pink mx-auto mb-6" />
+        <h1 className="text-4xl font-bold mb-4">Resource Not Found</h1>
+        <p className="text-text-gray mb-8">The tool you are looking for does not exist or has been removed.</p>
+        <button onClick={() => router.push('/search')} className="btn-primary">
+          Back to Directory
+        </button>
       </div>
     );
   }
 
+  // Find related tools (same category, excluding self)
+  const relatedTools = Object.values(SITE_RESOURCES).filter(r => r.category === resource.category && r.slug !== resource.slug);
+
+  // Mock extended data
+  const mockFeatures = [
+    "Intuitive user interface designed for speed",
+    "Export options in multiple modern formats",
+    "Cloud synchronization across all your devices",
+    "API access for developers (Pro plan)",
+    "24/7 priority customer support"
+  ];
+  
+  const mockUseCases = [
+    "Freelancers looking to streamline their workflow",
+    "Student projects needing quick, high-quality assets",
+    "Startup founders building MVPs rapidly",
+    "Content creators planning out their weekly schedules"
+  ];
+
   return (
-    <div className="pt-32 pb-20 container mx-auto px-6">
-      <Link
-        href="/categories"
-        className="inline-flex items-center gap-2 text-text-gray hover:text-primary transition-colors mb-12 group"
-      >
-        <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />{" "}
-        Back to Resources
-      </Link>
+    <div className="pb-32">
+      
+      {/* Premium Hero Section */}
+      <section className="relative pt-32 pb-20 overflow-hidden border-b border-white/5">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-secondary/10"></div>
+        <div className="absolute inset-0 noise-overlay opacity-30"></div>
+        
+        <div className="container mx-auto px-6 relative z-10">
+          <button 
+            onClick={() => router.back()}
+            className="flex items-center gap-2 text-sm font-medium text-text-gray hover:text-white transition-colors mb-8"
+          >
+            <ArrowLeft className="w-4 h-4" /> Back to Search
+          </button>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-        <div className="lg:col-span-2 space-y-12">
-          <section>
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
-              <div className="flex items-center gap-6">
-                <div className="w-24 h-24 gradient-bg rounded-3xl flex items-center justify-center shadow-2xl text-white font-bold text-4xl">
-                  {resource.title[0]}
-                </div>
-                <div>
-                  <div className="flex items-center gap-3 mb-2">
-                    <h1 className="text-4xl font-bold">{resource.title}</h1>
-                    <span className="px-3 py-1 bg-primary/10 text-primary text-xs font-bold rounded-full uppercase">
-                      Verified
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-4 text-text-gray text-sm">
-                    <span className="flex items-center gap-1">
-                      <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />{" "}
-                      {resource.rating} ({resource.reviews} reviews)
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Eye className="w-4 h-4" /> {resource.visits} visits
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <div className="flex gap-4">
-                <Link
-                  href="/saved"
-                  className="p-4 glass rounded-2xl hover:text-primary transition-colors inline-flex"
-                  aria-label="View saved resources"
-                >
-                  <Bookmark className="w-6 h-6" />
-                </Link>
-                <button
-                  type="button"
-                  onClick={handleShare}
-                  className="p-4 glass rounded-2xl hover:text-primary transition-colors"
-                  aria-label="Share this resource"
-                >
-                  <Share2 className="w-6 h-6" />
-                </button>
-              </div>
+          <div className="flex flex-col lg:flex-row gap-12 items-start">
+            
+            {/* Logo/Icon Container */}
+            <div className="w-32 h-32 md:w-40 md:h-40 shrink-0 rounded-[2rem] bg-gradient-to-br from-surface to-surface-hover border border-white/10 shadow-2xl flex items-center justify-center relative overflow-hidden group">
+              <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <span className="text-6xl font-black gradient-text group-hover:scale-110 transition-transform">{resource.title.charAt(0)}</span>
             </div>
 
-            <p className="text-xl text-text-white/80 leading-relaxed mb-8">
-              {resource.description}
-            </p>
-            {shareHint && (
-              <p className="text-sm text-primary mb-4" role="status">
-                Link copied or shared.
+            <div className="flex-grow">
+              <div className="flex flex-wrap items-center gap-3 mb-4">
+                <span className="text-xs font-bold uppercase tracking-wider text-primary bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
+                  {resource.category}
+                </span>
+                {resource.isTrending && <BadgeLabel type="trending" />}
+                {resource.rating > 4.8 && <BadgeLabel type="editor" />}
+              </div>
+              
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-4">{resource.title}</h1>
+              <p className="text-xl md:text-2xl text-text-gray mb-8 max-w-3xl leading-relaxed">
+                {resource.description}
               </p>
-            )}
 
-            <div className="flex flex-wrap gap-3 mb-12">
-              {resource.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="px-4 py-2 glass rounded-xl text-sm font-medium"
+              <div className="flex flex-wrap gap-2 mb-8">
+                {resource.tags.map(tag => (
+                  <span key={tag} className="text-sm px-4 py-2 bg-surface rounded-xl text-text-gray border border-white/5 font-medium hover:text-white hover:border-white/20 transition-all cursor-pointer">
+                    #{tag}
+                  </span>
+                ))}
+              </div>
+
+              <div className="flex flex-wrap gap-4 items-center">
+                <a 
+                  href={resource.websiteUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="btn-primary py-4 px-8 text-lg"
                 >
-                  #{tag}
-                </span>
-              ))}
-            </div>
-          </section>
-
-          <section className="space-y-8">
-            <h3 className="text-2xl font-bold border-l-4 border-primary pl-4">
-              Key Free Features
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {resource.freeFeatures.map((feature, i) => (
-                <div key={i} className="flex items-center gap-3 p-4 glass rounded-2xl">
-                  <CheckCircle2 className="w-5 h-5 text-green-500 shrink-0" />
-                  <span className="text-sm">{feature}</span>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <section className="space-y-8">
-            <h3 className="text-2xl font-bold border-l-4 border-secondary pl-4">
-              About {resource.title}
-            </h3>
-            <p className="text-text-gray leading-relaxed text-lg">
-              {resource.longDescription}
-            </p>
-          </section>
-        </div>
-
-        <div className="lg:col-span-1 space-y-8">
-          <div className="glass p-8 rounded-[2.5rem] border-white/10 sticky top-32">
-            <form action="/search" method="get" className="mb-8">
-              <label className="text-xs font-bold text-text-gray uppercase tracking-widest mb-2 block">
-                Search the hub
-              </label>
-              <div className="flex gap-2">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-gray pointer-events-none" />
-                  <input
-                    type="search"
-                    name="q"
-                    placeholder="icons, API, course…"
-                    className="w-full pl-10 pr-3 py-3 rounded-xl bg-white/5 border border-white/10 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
-                  />
-                </div>
-                <button type="submit" className="px-4 py-3 rounded-xl bg-primary text-white text-sm font-bold shrink-0">
-                  Go
+                  Visit Website <ExternalLink className="w-5 h-5" />
+                </a>
+                <button className="h-[60px] px-6 rounded-full glass-strong hover:bg-surface flex items-center justify-center gap-2 font-bold transition-colors">
+                  <Bookmark className="w-5 h-5" /> Save
                 </button>
-              </div>
-            </form>
+                <button className="h-[60px] w-[60px] rounded-full glass-strong hover:bg-surface flex items-center justify-center transition-colors">
+                  <Share2 className="w-5 h-5" />
+                </button>
 
-            <a
-              href={resource.websiteUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-primary w-full py-5 flex items-center justify-center gap-3 text-lg mb-8"
-            >
-              Visit Official Website{" "}
-              <ExternalLink className="w-5 h-5" />
-            </a>
-
-            <div className="space-y-6">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-text-gray flex items-center gap-2">
-                  <Calendar className="w-4 h-4" /> Last Updated
-                </span>
-                <span className="font-bold">{resource.lastUpdated}</span>
-              </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-text-gray flex items-center gap-2">
-                  <Info className="w-4 h-4" /> License
-                </span>
-                <span className="font-bold">Free / Freemium</span>
-              </div>
-              <div className="pt-6 border-t border-white/5">
-                <h4 className="font-bold mb-4">Use Cases</h4>
-                <div className="space-y-3">
-                  {resource.useCases.map((use, i) => (
-                    <div
-                      key={i}
-                      className="flex items-center gap-2 text-sm text-text-gray"
-                    >
-                      <div className="w-1.5 h-1.5 rounded-full bg-secondary" />
-                      {use}
-                    </div>
-                  ))}
+                <div className="ml-auto hidden sm:flex items-center gap-2 bg-surface px-4 py-3 rounded-2xl border border-white/5">
+                  <Star className="w-6 h-6 text-accent fill-accent" />
+                  <div className="flex flex-col">
+                    <span className="font-bold leading-none">{resource.rating} / 5.0</span>
+                    <span className="text-xs text-text-gray">248 Reviews</span>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className="mt-12 p-6 rounded-2xl bg-white/5 border border-white/5">
-              <h4 className="text-sm font-bold mb-2 flex items-center gap-2">
-                <MessageSquare className="w-4 h-4" /> Community Note
-              </h4>
-              <p className="text-xs text-text-gray leading-relaxed">
-                &quot;Well-known pick in this category—worth bookmarking and
-                trying the free tier first.&quot;
-              </p>
             </div>
           </div>
         </div>
-      </div>
+      </section>
+
+      {/* Main Content Area */}
+      <section className="container mx-auto px-6 pt-20">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+          
+          <div className="lg:col-span-2 space-y-16">
+            
+            {/* Features & Use Cases */}
+            <ToolFeatures features={mockFeatures} useCases={mockUseCases} />
+
+            {/* Screenshots / Previews Mockup */}
+            <div className="glass-card rounded-[2.5rem] p-2 overflow-hidden border-primary/20">
+              <div className="aspect-video bg-gradient-to-br from-surface to-background rounded-[2rem] flex items-center justify-center relative overflow-hidden group">
+                <div className="absolute inset-0 mesh-bg opacity-50"></div>
+                <div className="relative z-10 w-20 h-20 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center shadow-2xl cursor-pointer group-hover:scale-110 transition-transform border border-white/20">
+                  <div className="w-0 h-0 border-t-[10px] border-t-transparent border-l-[16px] border-l-white border-b-[10px] border-b-transparent ml-2"></div>
+                </div>
+                <p className="absolute bottom-6 left-6 font-bold text-white/50 group-hover:text-white transition-colors z-10">Product Walkthrough</p>
+              </div>
+            </div>
+
+            {/* Reviews */}
+            <ReviewSection />
+
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-8">
+            <div className="glass-card p-8 rounded-3xl sticky top-24">
+              <h3 className="text-lg font-bold mb-6">Tool Information</h3>
+              
+              <div className="space-y-4">
+                <div className="flex justify-between items-center py-3 border-b border-white/5">
+                  <span className="text-text-gray">Pricing</span>
+                  <span className="font-bold text-success">Freemium</span>
+                </div>
+                <div className="flex justify-between items-center py-3 border-b border-white/5">
+                  <span className="text-text-gray">Platform</span>
+                  <span className="font-bold">Web App</span>
+                </div>
+                <div className="flex justify-between items-center py-3 border-b border-white/5">
+                  <span className="text-text-gray">Added</span>
+                  <span className="font-bold">2 days ago</span>
+                </div>
+              </div>
+
+              <div className="mt-8 pt-8 border-t border-white/5">
+                <p className="text-sm text-text-gray mb-4">Did you find an issue with this tool or is the link broken?</p>
+                <button className="text-sm font-bold text-accent-pink hover:underline">Report an Issue</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        {/* Recommendations */}
+        <RelatedTools tools={relatedTools} />
+
+      </section>
+
     </div>
   );
 }
